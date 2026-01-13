@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Math Practice App</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 首页 -->
+<section id="homeSection">
+    <div class="home-header">
+        <div class="countdown" id="countdown">
+            <div class="calendar">
+                <span class="days" id="daysLeft">0</span>
+                <span class="label">Days</span>
+            </div>
+        </div>
+    </div>
+    <div class="home-content">
+        <h1>Practice. Earn points. Reward yourself.</h1>
+        <button onclick="enterSetup()">Enter</button>
+    </div>
+</section>
+
+<!-- 设置姓名/目标/奖励 -->
+<section id="setupSection" style="display:none;">
+    <h1>Set Your Profile & Goals 🎯</h1>
+    <input type="text" id="nameInput" placeholder="Enter your name">
+    <input type="number" id="goalInput" placeholder="Target points">
+    <input type="text" id="rewardInput" placeholder="Your reward">
+    <button onclick="saveProfile()">Start Practicing</button>
+</section>
+
+<!-- 章节选择页 -->
+<section id="chapterSection" style="display:none;">
+    <h1>Choose your topic</h1>
+    <div class="chapters">
+        <button onclick="startPractice(1)">Vectors ⭐</button>
+        <button onclick="startPractice(2)">Vectors ⭐⭐</button>
+        <button onclick="startPractice(3)">Vectors ⭐⭐⭐</button>
+    </div>
+</section>
+
+<!-- 练习页 -->
+<section id="practiceSection" style="display:none;">
+    <h2 id="practiceTitle"></h2>
+    <div class="goal" id="goalDisplay"></div>
+    <div class="points" id="pointsDisplay"></div>
+    <div class="combo" id="comboDisplay"></div>
+    <div class="question-box" id="questionBox"></div>
+    <input type="text" id="answerInput" placeholder="Enter magnitude">
+    <button onclick="submitAnswer()">Submit</button>
+</section>
+
+<!-- 达成目标 Modal -->
+<div id="congratsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeCongrats()">&times;</span>
+        <h2 id="congratsMessage"></h2>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
