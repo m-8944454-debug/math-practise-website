@@ -1,55 +1,143 @@
 body {
     margin: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #e0f7fa;
+    font-family: "Segoe UI", sans-serif;
+    background: linear-gradient(#dbefff, #eef7ff);
 }
 
-/* 首页 */
-#homeSection { height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; position:relative; }
-.home-header { width:100%; display:flex; justify-content:flex-end; padding:20px; }
-.countdown .calendar { background-color:#b2ebf2; border-radius:12px; padding:10px 20px; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
-.countdown .days { font-size:36px; font-weight:bold; color:#00796b; display:block; }
-.countdown .label { font-size:14px; color:#004d40; }
-.home-content h1 { font-size:36px; color:#00796b; margin-bottom:30px; }
-.home-content button { padding:12px 30px; font-size:18px; background-color:#4dd0e1; border:none; border-radius:12px; color:white; cursor:pointer; transition:transform 0.2s; }
-.home-content button:hover { transform:scale(1.05); }
+.page {
+    display: none;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
 
-/* 设置页 */
-#setupSection { height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
-#setupSection input { padding:12px; margin:10px; width:250px; font-size:16px; border-radius:12px; border:1px solid #00796b; }
-#setupSection button { padding:12px 30px; font-size:16px; background-color:#4dd0e1; border:none; border-radius:12px; color:#004d40; cursor:pointer; margin-top:20px; }
-#setupSection button:hover { transform:scale(1.05); }
+.landing h1 {
+    font-size: 3em;
+    color: #2b6cb0;
+    text-align: center;
+    margin-bottom: 30px;
+}
 
-/* 章节页 */
-#chapterSection { min-height:100vh; background-color:#b2ebf2; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
-#chapterSection h1 { color:#004d40; font-size:32px; margin-bottom:30px; }
-.chapters button { margin:10px; padding:12px 24px; font-size:18px; border-radius:12px; border:none; cursor:pointer; background-color:#4dd0e1; color:#004d40; transition:transform 0.2s; }
-.chapters button:hover { transform:scale(1.05); }
+.landing-calendar {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
 
-/* 练习页 */
-#practiceSection { min-height:100vh; background-color:#b2ebf2; display:flex; flex-direction:column; justify-content:center; align-items:center; }
-#practiceSection h2 { color:#004d40; margin-bottom:20px; }
-.question-box { background-color:white; padding:20px 30px; border-radius:12px; font-size:22px; margin:20px; box-shadow:0 4px 10px rgba(0,0,0,0.2); text-align:center; min-width:300px; }
-#answerInput { padding:12px; font-size:16px; border-radius:12px; border:1px solid #00796b; margin-bottom:20px; }
-#practiceSection button { padding:12px 30px; font-size:16px; border-radius:12px; border:none; background-color:#4dd0e1; color:#004d40; cursor:pointer; }
-#practiceSection button:hover { transform:scale(1.05); }
-.combo { font-size:18px; font-weight:bold; color:#00796b; margin-top:10px; }
+#sidebar {
+    position: fixed;
+    left: -240px;
+    top: 0;
+    width: 220px;
+    height: 100%;
+    background: #bee3f8;
+    padding: 20px;
+    transition: left 0.3s;
+    z-index: 10;
+    overflow-y: auto; /* ✅ 滚动支持 */
+}
 
-/* 答题动画 */
-.correct { animation: flashGreen 0.4s; }
-.wrong { animation: flashRed 0.4s; }
-.jump { animation: jump 0.4s; }
-.points-jump { animation: pointsJump 0.5s; }
-.celebrate { animation: celebrate 1s; }
-@keyframes flashGreen {0%{background:white;}50%{background:#a5d6a7;}100%{background:white;}}
-@keyframes flashRed {0%{background:white;}50%{background:#ef9a9a;}100%{background:white;}}
-@keyframes jump {0%{transform:translateY(0);}30%{transform:translateY(-15px);}50%{transform:translateY(0);}70%{transform:translateY(-8px);}100%{transform:translateY(0);}}
-@keyframes pointsJump {0%{transform:scale(1);color:#004d40;}50%{transform:scale(1.4);color:#00796b;}100%{transform:scale(1);color:#004d40;}}
-@keyframes celebrate {0%{background-color:#b2ebf2;}50%{background-color:#4dd0e1;}100%{background-color:#b2ebf2;}}
+#toggleBtn {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    font-size: 22px;
+    cursor: pointer;
+    z-index: 20;
+}
 
-/* Modal */
-.modal { display:none; position:fixed; z-index:10; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.5); }
-.modal-content { background-color:#b2ebf2; margin:15% auto; padding:20px; border-radius:12px; width:80%; max-width:400px; text-align:center; }
-.modal-content h2 { color:#004d40; font-size:24px; }
-.close { float:right; font-size:28px; cursor:pointer; color:#004d40; }
-.close:hover { color:#00796b; }
+.card {
+    background: white;
+    padding: 40px;
+    border-radius: 25px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 300px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+}
+
+button {
+    padding: 10px 25px;
+    margin: 8px;
+    border-radius: 25px;
+    border: none;
+    background: #90cdf4;
+    cursor: pointer;
+}
+
+button:hover { background: #63b3ed; }
+.danger { background: #feb2b2; }
+
+.calendar {
+    border: 2px solid #2b6cb0;
+    border-radius: 14px;
+    padding: 10px;
+    background: white;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.plainTitle {
+    font-size: 2em;
+    margin-bottom: 30px;
+    color: #2b6cb0;
+}
+
+.topicGrid {
+    display: flex;
+    gap: 20px;
+}
+
+.topicCard {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    width: 200px;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.topicCard:hover {
+    transform: translateY(-5px);
+}
+
+.levelCard {
+    background:white;
+    padding:12px;
+    border-radius:15px;
+    cursor:pointer;
+    margin:5px 0;
+    box-shadow:0 6px 12px rgba(0,0,0,.1);
+}
+
+.levelCard:hover{
+    background:#ebf8ff;
+}
+
+/* Data Page */
+.dataGrid {
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:20px;
+}
+
+.dataCard {
+    background:white;
+    padding:20px;
+    border-radius:20px;
+    width:250px;
+    text-align:center;
+    box-shadow:0 10px 20px rgba(0,0,0,0.1);
+    margin-bottom:15px;
+    font-size:1.2em;
+}

@@ -1,120 +1,183 @@
-let correctAnswer = "";
-let currentLevel = 1;
-let userName = "";
-let combo = 0;
+/* ================= PAGE CONTROL ================= */
+function hideAll(){ document.querySelectorAll(".page").forEach(p=>p.style.display="none"); }
+function show(id){ hideAll(); document.getElementById(id).style.display="flex"; }
 
-// 积分
-let points = localStorage.getItem("points");
-points = points ? parseInt(points) : 0;
+function goLanding(){ show("landingPage"); }
+function goProfile(){ show("profilePage"); }
+function goRewards(){ show("rewardPage"); renderRewards(); }
+function goTopic(){ show("topicPage"); }
+function goQuestion(){ show("questionPage"); }
+function goData(){ show("dataPage"); showData(); }
 
-// 目标 & 奖励
-let goal = localStorage.getItem("goal");
-let reward = localStorage.getItem("reward");
-
-// 动态倒数日
-function updateCountdown() {
-    const today = new Date();
-    const target = new Date(today.getFullYear(),4,4); // May 4
-    const diffTime = target - today;
-    const diffDays = Math.ceil(diffTime/(1000*60*60*24));
-    document.getElementById("daysLeft").innerText = diffDays>0? diffDays:0;
-}
-setInterval(updateCountdown,1000);
-updateCountdown();
-
-function enterSetup() {
-    document.getElementById("homeSection").style.display = "none";
-    document.getElementById("setupSection").style.display = "flex";
+/* ================= SIDEBAR ================= */
+let sidebarOpen=false;
+function toggleSidebar(){
+    sidebarOpen = !sidebarOpen;
+    document.getElementById("sidebar").style.left = sidebarOpen ? "0" : "-240px";
 }
 
-function saveProfile() {
-    userName = document.getElementById("nameInput").value;
-    goal = document.getElementById("goalInput").value;
-    reward = document.getElementById("rewardInput").value;
-    if(!userName || !goal || !reward){ alert("Please fill all fields!"); return;}
-    localStorage.setItem("goal",goal);
-    localStorage.setItem("reward",reward);
-    localStorage.setItem("userName",userName);
+/* ================= DATA ================= */
+let profile={}, rewards=[], points=0, combo=0, wrongCount=0;
+let currentTopic="", currentLevel="", currentQuestion=null;
 
-    document.getElementById("setupSection").style.display="none";
-    document.getElementById("chapterSection").style.display="flex";
-    updatePoints();
-    updateGoal();
+// Stats: topic->level->answered
+let stats = {
+    vector:{beginner:0,intermediate:0,advanced:0},
+    integration:{beginner:0,intermediate:0,advanced:0}
+};
+
+/* ================= STORAGE ================= */
+function save(){
+    localStorage.setItem("profile",JSON.stringify(profile));
+    localStorage.setItem("rewards",JSON.stringify(rewards));
+    localStorage.setItem("points",points);
+    localStorage.setItem("stats",JSON.stringify(stats));
+}
+function load(){
+    profile = JSON.parse(localStorage.getItem("profile")||"{}");
+    rewards = JSON.parse(localStorage.getItem("rewards")||"[]");
+    points = Number(localStorage.getItem("points")||0);
+    stats = JSON.parse(localStorage.getItem("stats")||JSON.stringify(stats));
 }
 
-function updatePoints(){ document.getElementById("pointsDisplay").innerText="Points: "+points; }
-function updateGoal(){ document.getElementById("goalDisplay").innerText="Goal: "+goal+" pts | Reward: "+reward; }
-
-function startPractice(level){
-    currentLevel = level;
-    combo=0;
-    document.getElementById("chapterSection").style.display="none";
-    document.getElementById("practiceSection").style.display="flex";
-    document.getElementById("practiceTitle").innerText="Vectors Practice - "+level+" Star";
-    updatePoints(); updateGoal(); generateQuestion();
+/* ================= LANDING ================= */
+function landingStart(){
+    if(profile.name){ goTopic(); } else { goProfile(); }
 }
 
-function generateQuestion(){
-    const q=document.getElementById("questionBox");
-    q.className="question-box";
-
-    let max=5,min=1;
-    if(currentLevel===1){min=1;max=5;}
-    if(currentLevel===2){min=3;max=10;}
-    if(currentLevel===3){min=5;max=15;}
-
-    let x=Math.floor(Math.random()*(max-min+1))+min;
-    let y=Math.floor(Math.random()*(max-min+1))+min;
-    let z=Math.floor(Math.random()*(max-min+1))+min;
-    correctAnswer = Math.sqrt(x*x + y*y + z*z).toFixed(2);
-
-    q.innerText=`Find magnitude of vector (${x}, ${y}, ${z})`;
-    document.getElementById("answerInput").value="";
-    document.getElementById("comboDisplay").innerText="Combo: "+combo;
+/* ================= PROFILE ================= */
+function saveProfile(){
+    profile.name=document.getElementById("profileName").value;
+    profile.desc=document.getElementById("profileDesc").value;
+    save();
+    alert("Profile saved successfully!");
 }
 
-function submitAnswer(){
-    const userAnswer=document.getElementById("answerInput").value;
-    const q=document.getElementById("questionBox");
-    const pointsEl=document.getElementById("pointsDisplay");
-
-    if(parseFloat(userAnswer).toFixed(2)===correctAnswer){
-        combo++;
-        let gain=10*combo;
-        points+=gain;
-        localStorage.setItem("points",points);
-        updatePoints();
-        document.getElementById("comboDisplay").innerText="Combo: "+combo;
-
-        q.classList.remove("correct","jump"); void q.offsetWidth;
-        q.classList.add("correct","jump");
-        pointsEl.classList.remove("points-jump"); void pointsEl.offsetWidth;
-        pointsEl.classList.add("points-jump");
-
-        if(points>=goal){
-            document.body.classList.add("celebrate");
-            showCongrats();
-        }else{ alert(`Correct! +${gain} points 🎉`); }
-        setTimeout(generateQuestion,500);
-    }else{
-        combo=0;
-        document.getElementById("comboDisplay").innerText="Combo: "+combo;
-        q.classList.remove("wrong"); void q.offsetWidth;
-        q.classList.add("wrong");
-        alert("Wrong, try again!");
+/* ================= CLEAR DATA ================= */
+function clearProfileData(){
+    if(confirm("Clear all data? This will reset profile, points, rewards, and stats.")){
+        profile={}; rewards=[]; points=0;
+        stats={vector:{beginner:0,intermediate:0,advanced:0}, integration:{beginner:0,intermediate:0,advanced:0}};
+        localStorage.clear();
+        alert("All data cleared! Reload to start as a new user.");
+        goProfile();
     }
 }
 
-// Modal
-function showCongrats(){
-    points=0; localStorage.setItem("points",points);
-    const modal=document.getElementById("congratsModal");
-    document.getElementById("congratsMessage").innerText=`Congratulations, ${userName}! You have done your goals! Let's redeem your award now!`;
-    modal.style.display="block";
+/* ================= REWARDS ================= */
+function addReward(){
+    if(rewards.length>=5) return alert("Maximum 5 rewards only");
+    rewards.push({name:"New Reward",points:50});
+    save(); renderRewards();
 }
 
-function closeCongrats(){
-    document.getElementById("congratsModal").style.display="none";
-    document.getElementById("practiceSection").style.display="none";
-    document.getElementById("setupSection").style.display="flex";
+function renderRewards(){
+    document.getElementById("pointsText").innerText=points;
+    const box=document.getElementById("rewardStore");
+    box.innerHTML="";
+    rewards.forEach((r,i)=>{
+        box.innerHTML+=`
+        <div class="rewardCard">
+            <b>${r.name}</b><br>${r.points} pts
+            <br><button onclick="redeem(${i})">Redeem</button>
+        </div>`;
+    });
 }
+
+function redeem(i){
+    if(points>=rewards[i].points){
+        points-=rewards[i].points;
+        rewards.splice(i,1);
+        save(); renderRewards();
+    } else alert("Not enough points");
+}
+
+/* ================= QUESTION BANK ================= */
+const vectorBank={
+    beginner:[{q:"Find |(3,4)|",ans:"5",sol:"√(3²+4²)=5"}],
+    intermediate:[{q:"Find a·b if a=(1,2), b=(3,4)",ans:"11",sol:"1*3+2*4=11"}],
+    advanced:[{q:"Explain collinearity of vectors",ans:null,sol:"Collinear if one vector is multiple of another"}]
+};
+
+const integrationBank={
+    beginner:[{q:"∫ 3x² dx",ans:"x^3 + C",sol:"∫ xⁿ dx = xⁿ⁺¹/(n+1)"}],
+    intermediate:[{q:"∫ x e^x dx",ans:"(x-1)e^x + C",sol:"Use integration by parts"},{q:"∫ 2x/(x²+1) dx",ans:"ln(x²+1) + C",sol:"Substitution u = x²+1"}],
+    advanced:[{q:"Area under y=x² from 0 to 1",ans:"1/3",sol:"∫₀¹ x² dx = 1/3"},{q:"Volume when y=x² rotated x-axis 0 to 1",ans:"π/5",sol:"V=π∫x⁴ dx=π/5"}]
+};
+
+/* ================= START TOPIC ================= */
+function startTopic(topic,level){
+    currentTopic=topic;
+    currentLevel=level;
+    combo=0; wrongCount=0;
+    nextQuestion(); goQuestion();
+}
+
+function topicBank(){
+    if(currentTopic==="vector") return vectorBank[currentLevel];
+    if(currentTopic==="integration") return integrationBank[currentLevel];
+    return [];
+}
+
+function nextQuestion(){
+    let bank=topicBank();
+    currentQuestion=bank[Math.floor(Math.random()*bank.length)];
+    document.getElementById("questionText").innerText=currentQuestion.q;
+    document.getElementById("answerInput").value="";
+    document.getElementById("comboText").innerText="";
+    document.getElementById("questionPoints").innerText=points;
+}
+
+/* ================= SUBMIT ANSWER ================= */
+function submitAnswer(){
+    const userAns=document.getElementById("answerInput").value.trim();
+    if(currentQuestion.ans===null){
+        points+=10;
+        stats[currentTopic][currentLevel]++;
+        save();
+        alert("Good explanation!");
+        nextQuestion(); return;
+    }
+
+    if(userAns===currentQuestion.ans){
+        points+=10;
+        combo++;
+        stats[currentTopic][currentLevel]++;
+        wrongCount=0;
+        document.getElementById("comboText").innerText=combo>1?`🔥 Combo x${combo}`:"";
+        save(); nextQuestion();
+    }else{
+        combo=0; wrongCount++;
+        if(wrongCount>=2){
+            const see=confirm("Wrong twice. See answer & solution?");
+            if(see){ alert(`Answer: ${currentQuestion.ans}\nSolution: ${currentQuestion.sol}`); }
+            wrongCount=0;
+        } else { alert("Wrong. Try again."); }
+    }
+}
+
+/* ================= EXIT QUESTION ================= */
+function exitQuestion(){ goTopic(); }
+
+/* ================= DATA PAGE ================= */
+function showData(){
+    const total=stats.vector.beginner+stats.vector.intermediate+stats.vector.advanced
+                +stats.integration.beginner+stats.integration.intermediate+stats.integration.advanced;
+    document.getElementById("dataTotal").innerHTML=`<b>Total Questions Answered:</b> ${total}`;
+    document.getElementById("dataVector").innerHTML=
+        `<b>Vector:</b><br>⭐ Beginner: ${stats.vector.beginner}<br>⭐⭐ Intermediate: ${stats.vector.intermediate}<br>⭐⭐⭐ Advanced: ${stats.vector.advanced}`;
+    document.getElementById("dataIntegration").innerHTML=
+        `<b>Integration:</b><br>⭐ Beginner: ${stats.integration.beginner}<br>⭐⭐ Intermediate: ${stats.integration.intermediate}<br>⭐⭐⭐ Advanced: ${stats.integration.advanced}`;
+}
+
+/* ================= COUNTDOWN ================= */
+function countdown(){
+    const days=Math.ceil((new Date("2026-05-04")-new Date())/86400000);
+    document.getElementById("countdownLanding").innerText=`PSPM SM025\n${days} days`;
+    document.getElementById("countdownSidebar").innerText=`PSPM SM025\n${days} days`;
+}
+
+/* ================= INIT ================= */
+window.onload=()=>{
+    load(); goLanding(); countdown();
+};
